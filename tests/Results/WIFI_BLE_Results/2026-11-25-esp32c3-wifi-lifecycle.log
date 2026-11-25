@@ -1,0 +1,347 @@
+ESP32-C3 Wi-Fi lifecycle | 2026-11-25T00:49:36+00:00
+Standalone setup: USB-powered XIAO ESP32-C3, 115200 baud, local 2.4 GHz AP, no harness jumpers required by these fixtures.
+Runner SHA-256: 7ba29e952bf814f09e4e7fdbcf77691a6eea2cf5b6c268ea910017f9694d5e33
+
+Test: tests/WIFI_BLE/wifi/wifi_legacy_station_regression.js
+Fixture SHA-256: eb547dcf2db1b0880797fe93597a9b046a1b9eb13d8eaecc5d05e1070eaf33f1
+Runner timeout: 102 s
+RUNNER test=tests/WIFI_BLE/wifi/wifi_legacy_station_regression.js
+RUNNER port=/dev/serial/by-path/pci-0000:00:14.0-usb-0:2.2:1.0
+RUNNER board=ESP32C3
+RUNNER version=2v29.525
+RUNNER git_commit=1b820a413
+RUNNER credentials=loaded_without_logging
+RUNNER password_exposed=yes
+TEST=wifi_legacy_station_regression
+TARGET=ESP32C3
+PASS initial_connected error=null ip=<assigned>
+PASS initial_callback_once count=1
+PASS deliberate_disconnect_completed callbacks=2
+INFO stage=unavailable_network
+INFO unavailable_callback error="NO_AP_FOUND"
+PASS unavailable_not_connected status="NO_AP_FOUND"
+PASS unavailable_recovery_connected error=null ip=<assigned>
+PASS unavailable_recovery_callback_once count=1
+FAIL overall_timeout
+METRIC valid_connect_callbacks=2
+METRIC deliberate_disconnect_callbacks=4
+METRIC unavailable_connect_callbacks=1
+METRIC associated_events=2
+METRIC connected_events=2
+METRIC disconnected_events=3
+METRIC repeated_cycles=1
+METRIC checks_passed=6
+METRIC checks_failed=1
+DONE=FAIL
+Password appeared in captured serial output.
+Runner exit: 1; wall time: 98.6 s; firmware identity matched: True; bench verdict: FAIL
+
+Test: tests/WIFI_BLE/wifi/wifi_connect_hardening_lifecycle.js
+Fixture SHA-256: a8cd524b2bea4dc8a31a431c9942721dac8a41529ddee6b937b51cccfe66839a
+Runner timeout: 135 s
+RUNNER test=tests/WIFI_BLE/wifi/wifi_connect_hardening_lifecycle.js
+RUNNER port=/dev/serial/by-path/pci-0000:00:14.0-usb-0:2.2:1.0
+RUNNER board=ESP32C3
+RUNNER version=2v29.525
+RUNNER git_commit=1b820a413
+RUNNER credentials=loaded_without_logging
+RUNNER password_exposed=yes
+TEST=wifi_connect_hardening_lifecycle
+TARGET=ESP32C3
+PASS initial_connection ip=<assigned>
+PASS reconnect_while_connected ip=<assigned>
+FAIL overall_timeout
+PASS initial_connection_callback_once
+PASS reconnect_while_connected_callback_once
+METRIC connect_cycles=0
+METRIC startup_free_heap=68584
+METRIC first_free_heap=0
+METRIC lowest_free_heap=0
+METRIC final_free_heap=68784
+METRIC final_heap_delta=68784
+PASS native_heap_no_material_loss
+METRIC checks_passed=5
+METRIC checks_failed=1
+DONE=FAIL
+Password appeared in captured serial output.
+Runner exit: 1; wall time: 127.8 s; firmware identity matched: True; bench verdict: FAIL
+
+Test: tests/WIFI_BLE/wifi/wifi_disconnect_hardening_lifecycle.js
+Fixture SHA-256: 6d6428382081dc7a598823c76638f47a253fd3437b09631f70e6428bf1a78e9b
+Runner timeout: 165 s
+RUNNER test=tests/WIFI_BLE/wifi/wifi_disconnect_hardening_lifecycle.js
+RUNNER port=/dev/serial/by-path/pci-0000:00:14.0-usb-0:2.2:1.0
+RUNNER board=ESP32C3
+RUNNER version=2v29.525
+RUNNER git_commit=1b820a413
+RUNNER credentials=loaded_without_logging
+RUNNER password_exposed=yes
+TEST=wifi_disconnect_hardening_lifecycle
+TARGET=ESP32C3
+INFO stage=idle_disconnect
+PASS idle_disconnect_callback_once count=1
+PASS idle_disconnect_no_event count=0
+PASS connected_disconnect_connect error=null callbacks=1
+PASS connected_disconnect_connect_callback_once count=1
+INFO stage=connected_disconnect
+PASS connected_disconnect_callback_once count=1
+FAIL connected_disconnect_event_once count=0
+INFO stage=cancel_connect
+INFO disconnected_event stage=cancel_connect details={"ssid":"<redacted>","mac":"<mac>","reason":"8","msg":"ASSOC_LEAVE"}
+FAIL cancel_connect_callback_once count=0
+FAIL cancel_connect_reason error=null
+PASS cancel_disconnect_callback_once count=1
+PASS cancel_disconnect_event_bounded count=1
+PASS cancel_recovery_connect error=null callbacks=1
+PASS cancel_recovery_connect_callback_once count=1
+FAIL overall_timeout stage=cancel_connect
+METRIC checks_passed=9
+METRIC checks_failed=4
+DONE=FAIL
+Password appeared in captured serial output.
+Runner exit: 1; wall time: 160.3 s; firmware identity matched: True; bench verdict: FAIL
+Cleanup verified (injected credentials removed and no station IP): True
+Standalone fixtures passed: 0/3
+
+Controlled-peer lifecycle | 2026-11-25T00:56:16+00:00
+C3 station target and S3 WPA2 AP/UDP peer on their verified USB ports. Run-local configuration and role mapping. Existing fixtures and runner source.
+Config base: tests/WIFI_BLE/esp32_wifi_async_current_master_bench_config.json; run configuration SHA-256: d4f3c4ccc61c41041d8ab46c7c5a7a2a97799989897f4203802a4914eef933f9
+Bench preflight /dev/serial/by-path/pci-0000:00:14.0-usb-0:2.2:1.0: {"board": "ESP32C3", "version": "2v29.525", "git_commit": "1b820a413"}; radio inactive=True
+Bench preflight /dev/serial/by-path/pci-0000:00:14.0-usb-0:2.1:1.0: {"board": "ESP32S3", "version": "2v29.536", "git_commit": "0cd5e987e"}; radio inactive=True
+Fixture SHA-256: c1ae9c67b33ba8709c177de7884207d7e5b40c3e807cdd9f897d4fd3948cffbd; peer fixture SHA-256: 4dba08e8cdb143f75bcc16822320291804009c6958a8af0e6cffc94a9b03637b
+
+Test: wifi_station_transition_lifecycle
+Arguments: --direction s3-peer-c3-target --target-script tests/WIFI_BLE/wifi/wifi_station_transition_lifecycle.js --peer-script tests/WIFI_BLE/wifi/wifi_supervisor_peer.js --target-timeout 90 --overall-timeout-ms 60000
+RUNNER test=wifi_station_peer_positive
+RUNNER config=/tmp/esp32c3-lifecycle.NwU5nBkx/c3-s3-bench.json
+RUNNER run_id=20261125T005622Z
+RUNNER direction=s3-peer-c3-target
+RUNNER peer_position=esp32_s3
+RUNNER peer_path=/dev/serial/by-path/pci-0000:00:14.0-usb-0:2.1:1.0
+RUNNER target_position=esp32_c3_v1
+RUNNER target_path=/dev/serial/by-path/pci-0000:00:14.0-usb-0:2.2:1.0
+RUNNER peer_identity={"board": "ESP32S3", "git_commit": "0cd5e987e", "version": "2v29.536"}
+RUNNER target_identity={"board": "ESP32C3", "git_commit": "1b820a413", "version": "2v29.525"}
+RUNNER peer_ip=192.168.4.1
+PASS wifi_peer_received_challenge
+PASS wifi_peer_observed_station_join
+PASS wifi_peer_observed_station_leave
+PASS wifi_peer_cleanup
+RUNNER peer_final_status={'station': 'UNINITIALIZED', 'mode': 'NULL', 'powersave': 'min_modem'}
+RUNNER target_final_status={'station': 'ASSOC_LEAVE', 'mode': 'NULL', 'powersave': 'min_modem'}
+RUNNER peer_cleanup_runtime_reset=False
+RUNNER target_cleanup_runtime_reset=False
+RUNNER peer_final_ip={'ip': '0.0.0.0', 'netmask': '0.0.0.0', 'gw': '0.0.0.0', 'mac': '<mac>'}
+RUNNER target_final_ip={'ip': '0.0.0.0', 'netmask': '0.0.0.0', 'gw': '0.0.0.0', 'mac': '<mac>'}
+PASS wifi_runtime_cleanup
+RUNNER target_output_begin
+TEST=wifi_station_transition_lifecycle
+TARGET=ESP32C3
+INFO idle_connect_callback={"error":null,"status":{"station":"connected","ssid":"ESPRUINO_V2_005622","bssid":"<mac>","channel":6,"rssi":-82,"htMode":"HT40+","authMode":"wpa2","mode":"STA","powersave":"min_modem"}}
+PASS idle_connect_callback
+INFO idle_connect_state={"status":{"station":"connected","ssid":"ESPRUINO_V2_005622","bssid":"<mac>","channel":6,"rssi":-82,"htMode":"HT40+","authMode":"wpa2","mode":"STA","powersave":"min_modem"},"ip":{"ip":"192.168.4.2","netmask":"255.255.255.0","gw":"192.168.4.1","mac":"<mac>"}}
+PASS idle_connect_connected ip=192.168.4.2
+PASS idle_connect_udp peer=192.168.4.1
+INFO connected_scan={"error":null,"count":13,"matches":1}
+PASS connected_scan_peer_visible
+PASS connected_scan_preserved_connection ip=192.168.4.2
+PASS connected_scan_udp peer=192.168.4.1
+INFO connected_reconnect_callback={"error":null,"status":{"station":"connected","ssid":"ESPRUINO_V2_005622","bssid":"<mac>","channel":6,"rssi":-83,"htMode":"HT40+","authMode":"wpa2","mode":"STA","powersave":"min_modem"}}
+PASS connected_reconnect_callback
+INFO connected_reconnect_state={"status":{"station":"connected","ssid":"ESPRUINO_V2_005622","bssid":"<mac>","channel":6,"rssi":-83,"htMode":"HT40+","authMode":"wpa2","mode":"STA","powersave":"min_modem"},"ip":{"ip":"192.168.4.2","netmask":"255.255.255.0","gw":"192.168.4.1","mac":"<mac>"}}
+PASS connected_reconnect_connected ip=192.168.4.2
+PASS connected_reconnect_udp peer=192.168.4.1
+PASS explicit_disconnect_no_ip
+PASS disconnected_scan_peer_visible
+PASS disconnected_scan_did_not_connect
+INFO post_scan_connect_callback={"error":null,"status":{"station":"connected","ssid":"ESPRUINO_V2_005622","bssid":"<mac>","channel":6,"rssi":-81,"htMode":"HT40+","authMode":"wpa2","mode":"STA","powersave":"min_modem"}}
+PASS post_scan_connect_callback
+INFO post_scan_connect_state={"status":{"station":"connected","ssid":"ESPRUINO_V2_005622","bssid":"<mac>","channel":6,"rssi":-81,"htMode":"HT40+","authMode":"wpa2","mode":"STA","powersave":"min_modem"},"ip":{"ip":"192.168.4.2","netmask":"255.255.255.0","gw":"192.168.4.1","mac":"<mac>"}}
+PASS post_scan_connect_connected ip=192.168.4.2
+PASS post_scan_connect_udp peer=192.168.4.1
+INFO event_counts={"associated":3,"connected":3,"disconnected":2}
+METRIC checks_passed=15
+METRIC checks_failed=0
+DONE=PASS
+RUNNER target_output_end
+RUNNER peer_output_begin
+PEER_READY={"runId":"20261125T005622Z","ssid":"ESPRUINO_V2_005622","channel":6,"udpPort":41234,"apIP":{"ip":"192.168.4.1"},"time":1795568200874.65209960937}
+PEER_EVENT={"name":"sta_joined","details":{"mac":"<mac>"},"time":1795568209511.92993164062}
+PEER_RX={"data":"20261125T005622Z|idle_connect|WIFI_LIFECYCLE","address":"192.168.4.2","port":55554,"time":1795568211098.35498046875}
+PEER_RX={"data":"20261125T005622Z|connected_scan|WIFI_LIFECYCLE","address":"192.168.4.2","port":55555,"time":1795568216754.3779296875}
+PEER_EVENT={"name":"sta_left","details":{"mac":"<mac>"},"time":1795568216882.7109375}
+PEER_EVENT={"name":"sta_joined","details":{"mac":"<mac>"},"time":1795568216931.29614257812}
+PEER_RX={"data":"20261125T005622Z|connected_reconnect|WIFI_LIFECYCLE","address":"192.168.4.2","port":55556,"time":1795568218382.86401367187}
+PEER_EVENT={"name":"sta_left","details":{"mac":"<mac>"},"time":1795568218421.35107421875}
+PEER_EVENT={"name":"sta_joined","details":{"mac":"<mac>"},"time":1795568224538.96801757812}
+PEER_RX={"data":"20261125T005622Z|post_scan_connect|WIFI_LIFECYCLE","address":"192.168.4.2","port":55557,"time":1795568225985.74194335937}
+PEER_EVENT={"name":"sta_left","details":{"mac":"<mac>"},"time":1795568226081.31298828125}
+PEER_SUMMARY={"runId":"20261125T005622Z","eventNames":["sta_joined","sta_left","sta_joined","sta_left","sta_joined","sta_left"],"receivedData":"20261125T005622Z|idle_connect|WIFI_LIFECYCLE","pingBytes":null,"apIP":"192.168.4.1"}
+PEER_DONE={"runId":"20261125T005622Z","mode":"NULL","ip":"0.0.0.0","time":1795568227586.22900390625}
+RUNNER peer_output_end
+RUNNER_RESULT=PASS
+Runner exit: 0; wall time: 48.0 s; bench verdict: PASS
+Fixture SHA-256: b55c2a9168d9aeb2c468271fc31538d2a87dd917a027bc7e22046fddc2041e29; peer fixture SHA-256: 4dba08e8cdb143f75bcc16822320291804009c6958a8af0e6cffc94a9b03637b
+
+Test: wifi_connect_cancel_lifecycle
+Arguments: --direction s3-peer-c3-target --target-script tests/WIFI_BLE/wifi/wifi_connect_cancel_lifecycle.js --peer-script tests/WIFI_BLE/wifi/wifi_supervisor_peer.js --target-timeout 90 --overall-timeout-ms 60000
+RUNNER test=wifi_station_peer_positive
+RUNNER config=/tmp/esp32c3-lifecycle.NwU5nBkx/c3-s3-bench.json
+RUNNER run_id=20261125T005710Z
+RUNNER direction=s3-peer-c3-target
+RUNNER peer_position=esp32_s3
+RUNNER peer_path=/dev/serial/by-path/pci-0000:00:14.0-usb-0:2.1:1.0
+RUNNER target_position=esp32_c3_v1
+RUNNER target_path=/dev/serial/by-path/pci-0000:00:14.0-usb-0:2.2:1.0
+RUNNER peer_identity={"board": "ESP32S3", "git_commit": "0cd5e987e", "version": "2v29.536"}
+RUNNER target_identity={"board": "ESP32C3", "git_commit": "1b820a413", "version": "2v29.525"}
+RUNNER peer_ip=192.168.4.1
+PASS wifi_peer_received_challenge
+PASS wifi_peer_observed_station_join
+PASS wifi_peer_observed_station_leave
+PASS wifi_peer_cleanup
+RUNNER peer_final_status={'station': 'UNINITIALIZED', 'mode': 'NULL', 'powersave': 'min_modem'}
+RUNNER target_final_status={'station': 'ASSOC_LEAVE', 'mode': 'NULL', 'powersave': 'min_modem'}
+RUNNER peer_cleanup_runtime_reset=False
+RUNNER target_cleanup_runtime_reset=False
+RUNNER peer_final_ip={'ip': '0.0.0.0', 'netmask': '0.0.0.0', 'gw': '0.0.0.0', 'mac': '<mac>'}
+RUNNER target_final_ip={'ip': '0.0.0.0', 'netmask': '0.0.0.0', 'gw': '0.0.0.0', 'mac': '<mac>'}
+PASS wifi_runtime_cleanup
+RUNNER target_output_begin
+TEST=wifi_connect_cancel_lifecycle
+TARGET=ESP32C3
+INFO cancelled_connect_callback="Unknown reason"
+PASS cancelled_connect_remained_disconnected
+PASS cycle_1_connect ip=192.168.4.2
+PASS cycle_1_udp
+PASS cycle_2_connect ip=192.168.4.2
+PASS cycle_2_udp
+PASS cycle_3_connect ip=192.168.4.2
+PASS cycle_3_udp
+PASS cycle_4_connect ip=192.168.4.2
+PASS cycle_4_udp
+PASS cycle_5_connect ip=192.168.4.2
+PASS cycle_5_udp
+METRIC completed_cycles=5
+METRIC checks_passed=11
+METRIC checks_failed=0
+DONE=PASS
+RUNNER target_output_end
+RUNNER peer_output_begin
+PEER_READY={"runId":"20261125T005710Z","ssid":"ESPRUINO_V2_005710","channel":6,"udpPort":41234,"apIP":{"ip":"192.168.4.1"},"time":1795568248833.35400390625}
+PEER_EVENT={"name":"sta_joined","details":{"mac":"<mac>"},"time":1795568255624.205078125}
+PEER_RX={"data":"20261125T005710Z|cycle_1|CONNECT_CANCEL","address":"192.168.4.2","port":57445,"time":1795568256810.044921875}
+PEER_EVENT={"name":"sta_left","details":{"mac":"<mac>"},"time":1795568256851.33715820312}
+PEER_EVENT={"name":"sta_joined","details":{"mac":"<mac>"},"time":1795568257448.44506835937}
+PEER_RX={"data":"20261125T005710Z|cycle_2|CONNECT_CANCEL","address":"192.168.4.2","port":57446,"time":1795568258684.38696289062}
+PEER_EVENT={"name":"sta_left","details":{"mac":"<mac>"},"time":1795568258779.63403320312}
+PEER_EVENT={"name":"sta_joined","details":{"mac":"<mac>"},"time":1795568259439.73999023437}
+PEER_RX={"data":"20261125T005710Z|cycle_3|CONNECT_CANCEL","address":"192.168.4.2","port":57447,"time":1795568260700.29614257812}
+PEER_EVENT={"name":"sta_left","details":{"mac":"<mac>"},"time":1795568260739.39111328125}
+PEER_EVENT={"name":"sta_joined","details":{"mac":"<mac>"},"time":1795568261319.541015625}
+PEER_RX={"data":"20261125T005710Z|cycle_4|CONNECT_CANCEL","address":"192.168.4.2","port":57448,"time":1795568262557.580078125}
+PEER_EVENT={"name":"sta_left","details":{"mac":"<mac>"},"time":1795568262591.06103515625}
+PEER_EVENT={"name":"sta_joined","details":{"mac":"<mac>"},"time":1795568263199.0859375}
+PEER_RX={"data":"20261125T005710Z|cycle_5|CONNECT_CANCEL","address":"192.168.4.2","port":57449,"time":1795568264487.6259765625}
+PEER_EVENT={"name":"sta_left","details":{"mac":"<mac>"},"time":1795568264539.85913085937}
+PEER_SUMMARY={"runId":"20261125T005710Z","eventNames":["sta_joined","sta_left","sta_joined","sta_left","sta_joined","sta_left","sta_joined","sta_left","sta_joined","sta_left"],"receivedData":"20261125T005710Z|cycle_1|CONNECT_CANCEL","pingBytes":null,"apIP":"192.168.4.1"}
+PEER_DONE={"runId":"20261125T005710Z","mode":"NULL","ip":"0.0.0.0","time":1795568266609.998046875}
+RUNNER peer_output_end
+RUNNER_RESULT=PASS
+Runner exit: 0; wall time: 39.2 s; bench verdict: PASS
+Fixture SHA-256: 1af316907813f80cc829dba49d2d6d8a2d3c4b0e9056911f6b873c6bb4d4321e; peer fixture SHA-256: 6113c201c64b89b75b03fc59d05de1b7dde784eb64c9f3811c8f65a05e4d36e7
+
+Test: wifi_station_recovery_lifecycle
+Arguments: --direction s3-peer-c3-target --target-script tests/WIFI_BLE/wifi/wifi_station_recovery_lifecycle.js --peer-script tests/WIFI_BLE/wifi/wifi_recovery_peer.js --target-timeout 60 --overall-timeout-ms 40000
+RUNNER test=wifi_station_peer_positive
+RUNNER config=/tmp/esp32c3-lifecycle.NwU5nBkx/c3-s3-bench.json
+RUNNER run_id=20261125T005750Z
+RUNNER direction=s3-peer-c3-target
+RUNNER peer_position=esp32_s3
+RUNNER peer_path=/dev/serial/by-path/pci-0000:00:14.0-usb-0:2.1:1.0
+RUNNER target_position=esp32_c3_v1
+RUNNER target_path=/dev/serial/by-path/pci-0000:00:14.0-usb-0:2.2:1.0
+RUNNER peer_identity={"board": "ESP32S3", "git_commit": "0cd5e987e", "version": "2v29.536"}
+RUNNER target_identity={"board": "ESP32C3", "git_commit": "1b820a413", "version": "2v29.525"}
+RUNNER peer_ip=192.168.4.1
+PASS wifi_peer_received_challenge
+PASS wifi_peer_observed_station_join
+PASS wifi_peer_observed_station_leave
+PASS wifi_peer_cleanup
+RUNNER peer_final_status={'station': 'UNINITIALIZED', 'mode': 'NULL', 'powersave': 'min_modem'}
+RUNNER target_final_status={'station': 'ASSOC_LEAVE', 'mode': 'NULL', 'powersave': 'min_modem'}
+RUNNER peer_cleanup_runtime_reset=False
+RUNNER target_cleanup_runtime_reset=False
+RUNNER peer_final_ip={'ip': '0.0.0.0', 'netmask': '0.0.0.0', 'gw': '0.0.0.0', 'mac': '<mac>'}
+RUNNER target_final_ip={'ip': '0.0.0.0', 'netmask': '0.0.0.0', 'gw': '0.0.0.0', 'mac': '<mac>'}
+PASS wifi_runtime_cleanup
+RUNNER target_output_begin
+TEST=wifi_station_recovery_lifecycle
+TARGET=ESP32C3
+PASS initial_connect ip=192.168.4.2
+PASS before_outage_udp
+PASS outage_control_udp
+INFO recovery={"error":null,"disconnectedSeen":false,"status":{"station":"connected","ssid":"ESPRUINO_V2_005750","bssid":"<mac>","channel":6,"rssi":-83,"htMode":"HT40+","authMode":"wpa2","mode":"STA","powersave":"min_modem"},"ip":{"ip":"192.168.4.2","netmask":"255.255.255.0","gw":"192.168.4.1","mac":"<mac>"}}
+FAIL ap_loss_observed
+PASS explicit_reconnect ip=192.168.4.2
+PASS after_restore_udp
+METRIC checks_passed=5
+METRIC checks_failed=1
+DONE=FAIL
+RUNNER target_output_end
+RUNNER peer_output_begin
+PEER_READY={"runId":"20261125T005750Z","ssid":"ESPRUINO_V2_005750","channel":6,"udpPort":41234,"apDetails":{"authMode":"wpa2","hidden":false,"maxConn":4,"ssid":"ESPRUINO_V2_005750","password":"<redacted>"},"apIP":{"ip":"192.168.4.1","netmask":"255.255.255.0","gw":"192.168.4.1","mac":"<mac>"},"time":1795568287287.02905273437}
+PEER_EVENT={"name":"sta_joined","details":{"mac":"<mac>"},"time":1795568291538.287109375}
+PEER_RX={"data":"20261125T005750Z|BEFORE_OUTAGE","address":"192.168.4.2","port":50421,"time":1795568292708.5771484375}
+PEER_RX={"data":"20261125T005750Z|CONTROL_DROP_RESTORE","address":"192.168.4.2","port":50422,"time":1795568292747.89208984375}
+PEER_EVENT={"name":"sta_left","details":{"mac":"<mac>"},"time":1795568293025.50512695312}
+PEER_AP_STOPPED={"time":1795568293039.3701171875}
+PEER_AP_RESTORED={"runId":"20261125T005750Z","ssid":"ESPRUINO_V2_005750","channel":6,"udpPort":41234,"apDetails":{"authMode":"wpa2","hidden":false,"maxConn":4,"ssid":"ESPRUINO_V2_005750","password":"<redacted>"},"apIP":{"ip":"192.168.4.1","netmask":"255.255.255.0","gw":"192.168.4.1","mac":"<mac>"},"time":1795568301076.69799804687}
+PEER_EVENT={"name":"sta_joined","details":{"mac":"<mac>"},"time":1795568304986.21508789062}
+PEER_RX={"data":"20261125T005750Z|AFTER_RESTORE","address":"192.168.4.2","port":50423,"time":1795568306327.23193359375}
+PEER_EVENT={"name":"sta_left","details":{"mac":"<mac>"},"time":1795568306405.26391601562}
+PEER_SUMMARY={"runId":"20261125T005750Z","events":[{"name":"sta_joined","details":{"mac":"<mac>"},"time":1795568291538.287109375},{"name":"sta_left","details":{"mac":"<mac>"},"time":1795568293025.50512695312},{"name":"sta_joined","details":{"mac":"<mac>"},"time":1795568304986.21508789062},{"name":"sta_left","details":{"mac":"<mac>"},"time":1795568306405.26391601562}],"received":[{"data":"20261125T005750Z|BEFORE_OUTAGE","address":"192.168.4.2","port":50421,"time":1795568292708.5771484375},{"data":"20261125T005750Z|CONTROL_DROP_RESTORE","address":"192.168.4.2","port":50422,"time":1795568292747.89208984375},{"data":"20261125T005750Z|AFTER_RESTORE","address":"192.168.4.2","port":50423,"time":1795568306327.23193359375}],"pingResult":null,"apDetails":{"authMode":"wpa2","hidden":false,"maxConn":4,"ssid":"ESPRUINO_V2_005750","password":"<redacted>"},"apIP":{"ip":"192.168.4.1","netmask":"255.255.255.0","gw":"192.168.4.1","mac":"<mac>"}}
+PEER_DONE={"runId":"20261125T005750Z","status":{"station":"UNINITIALIZED","mode":"NULL","powersave":"min_modem"},"ip":{"ip":"0.0.0.0","netmask":"0.0.0.0","gw":"0.0.0.0","mac":"<mac>"},"time":1795568307940.65502929687}
+RUNNER peer_output_end
+RUNNER_RESULT=FAIL
+Runner exit: 1; wall time: 41.2 s; bench verdict: FAIL
+Saved-station preflight confirmed .wificfg absent on C3.
+
+Test: wifi_saved_station_restore
+Arguments: 
+RUNNER test=wifi_saved_station_restore
+RUNNER config=/tmp/esp32c3-lifecycle.NwU5nBkx/c3-s3-bench.json
+RUNNER run_id=20261125T005834Z
+RUNNER peer_path=/dev/serial/by-path/pci-0000:00:14.0-usb-0:2.1:1.0
+RUNNER target_path=/dev/serial/by-path/pci-0000:00:14.0-usb-0:2.2:1.0
+RUNNER peer_identity={"board": "ESP32S3", "git_commit": "0cd5e987e", "version": "2v29.536"}
+RUNNER target_identity={"board": "ESP32C3", "git_commit": "1b820a413", "version": "2v29.525"}
+RUNNER peer_ip=192.168.4.1
+PASS restore_configuration_prepared
+PASS restored_target_script
+PASS peer_observed_pre_and_post_reboot_joins
+PASS peer_received_restored_udp
+RUNNER peer_final_status={'station': 'UNINITIALIZED', 'mode': 'NULL', 'powersave': 'min_modem'}
+RUNNER peer_final_ip={'ip': '0.0.0.0', 'netmask': '0.0.0.0', 'gw': '0.0.0.0', 'mac': '<mac>'}
+RUNNER peer_cleanup_runtime_reset=False
+RUNNER target_final_status={'station': 'ASSOC_LEAVE', 'mode': 'NULL', 'powersave': 'min_modem'}
+RUNNER target_final_ip={'ip': '0.0.0.0', 'netmask': '0.0.0.0', 'gw': '0.0.0.0', 'mac': '<mac>'}
+RUNNER target_cleanup_runtime_reset=False
+RUNNER prepare_output_begin
+TEST=wifi_restore_prepare
+TARGET=ESP32C3
+PASS restore_configuration_saved
+RUNNER prepare_output_end
+RUNNER verify_output_begin
+TEST=wifi_restore_verify
+TARGET=ESP32C3
+PASS restored_after_hardware_reboot ip=192.168.4.2
+DONE=PASS
+RUNNER verify_output_end
+RUNNER peer_output_begin
+RUNNER peer_output_end
+RUNNER_RESULT=PASS
+Runner exit: 0; wall time: 32.9 s; bench verdict: PASS
+Final esp32_c3_v1: radio inactive=True; injected config absent=True; saved .wificfg absent=True
+Final esp32_s3: radio inactive=True; injected config absent=True; saved .wificfg absent=True
+Controlled-peer fixtures passed: 3/4

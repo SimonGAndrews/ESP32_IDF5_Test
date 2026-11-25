@@ -1,0 +1,5 @@
+/tests/WIFI_BLE/local_wifi_credentials.json
+/tests/Results/firmware-backups/
+
+__pycache__/
+*.pyc

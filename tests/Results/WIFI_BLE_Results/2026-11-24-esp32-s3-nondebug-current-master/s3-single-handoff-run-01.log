@@ -1,0 +1,34 @@
+Missing DONE marker in structured output.
+RUNNER test=docs/investigations/wifi/repros/esp32_wifi_ping_single_handoff.js
+RUNNER port=/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_68:B6:B3:27:2C:40-if00
+RUNNER baud=115200
+RUNNER transport=direct
+RUNNER board=ESP32S3
+RUNNER version=2v29.536
+RUNNER git_commit=0cd5e987e
+TEST=esp32_wifi_ping_single_handoff
+INFO board="ESP32S3"
+INFO version="2v29.536"
+INFO git_commit="0cd5e987e"
+INFO call=accepted
+INFO callback={"index":1,"type":"object","valid":true,"result":{"totalCount":1,"totalBytes":64,"totalTime":0,"respTime":0,"seqNo":1,"timeoutCount":0,"bytes":64,"error":0}}
+INFO callback={"index":2,"type":"object","valid":true,"result":{"totalCount":2,"totalBytes":128,"totalTime":0,"respTime":0,"seqNo":2,"timeoutCount":0,"bytes":64,"error":0}}
+INFO callback={"index":4,"type":"object","valid":true,"result":{"totalCount":4,"totalBytes":256,"totalTime":0,"respTime":0,"seqNo":4,"timeoutCount":0,"bytes":64,"error":0}}
+INFO callback={"index":5,"type":"object","valid":true,"result":{"totalCount":5,"totalBytes":320,"totalTime":0,"respTime":0,"seqNo":5,"timeoutCount":0,"bytes":64,"error":0}}
+RUNNER raw_output_begin
+TEST=esp32_wifi_ping_single_handoff
+INFO board="ESP32S3"
+INFO version="2v29.536"
+INFO git_commit="0cd5e987e"
+INFO call=accepted
+INFO callback={"index":1,"type":"object","valid":true,"result":{"totalCount":1,"totalBytes":64,"totalTime":0,"respTime":0,"seqNo":1,"timeoutCount":0,"bytes":64,"error":0}}
+INFO callback={"index":2,"type":"object","valid":true,"result":{"totalCount":2,"totalBytes":128,"totalTime":0,"respTime":0,"seqNo":2,"timeoutCount":0,"bytes":64,"error":0}}
+OUT OF MEMORYExecution Interrupted
+New interpreter error: MEMORY
+Uncaught InternalError: Variable type cannot be converted to string
+    at :17:6
+    }));
+     ^
+INFO callback={"index":4,"type":"object","valid":true,"result":{"totalCount":4,"totalBytes":256,"totalTime":0,"respTime":0,"seqNo":4,"timeoutCount":0,"bytes":64,"error":0}}
+INFO callback={"index":5,"type":"object","valid":true,"result":{"totalCount":5,"totalBytes":320,"totalTime":0,"respTime":0,"seqNo":5,"timeoutCount":0,"bytes":64,"error":0}}
+RUNNER raw_output_end

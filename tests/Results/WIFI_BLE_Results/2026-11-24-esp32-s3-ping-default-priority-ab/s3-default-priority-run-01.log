@@ -1,0 +1,61 @@
+Missing DONE marker in structured output.
+RUNNER test=docs/investigations/wifi/repros/esp32_wifi_ping_single_handoff.js
+RUNNER port=/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_68:B6:B3:27:2C:40-if00
+RUNNER baud=115200
+RUNNER transport=direct
+RUNNER board=ESP32S3
+RUNNER version=2v29.536
+RUNNER git_commit=0cd5e987e
+TEST=esp32_wifi_ping_single_handoff
+INFO board="ESP32S3"
+INFO version="2v29.536"
+INFO git_commit="0cd5e987e"
+INFO call=accepted
+INFO callback={"index":1,"type":"object","valid":true,"result":{"totalCount":1,"totalBytes":64,"totalTime":0,"respTime":0,"seqNo":1,"timeoutCount":0,"bytes":64,"error":0}}
+RUNNER raw_output_begin
+TEST=esp32_wifi_ping_single_handoff
+INFO board="ESP32S3"
+INFO version="2v29.536"
+INFO git_commit="0cd5e987e"
+INFO call=accepted
+INFO callback={"index":1,"type":"object","valid":true,"result":{"totalCount":1,"totalBytes":64,"totalTime":0,"respTime":0,"seqNo":1,"timeoutCount":0,"bytes":64,"error":0}}
+
+abort() was called at PC 0x40376c1b on core 0
+
+
+Backtrace: 0x40383159:0x3fcbf280 0x40383121:0x3fcbf2a0 0x40389d6e:0x3fcbf2c0 0x40376c1b:0x3fcbf330 0x40376ce1:0x3fcbf360 0x42006de7:0x3fcbf380 0x42006fa3:0x3fcbf3a0 0x4210add5:0x3fcbf3c0 0x40376fb2:0x3fcbf3e0 0x420274b0:0x3fcbf410 0x420279f9:0x3fcbf500 0x4200c7f1:0x3fcbf520
+
+
+
+
+ELF file SHA256: 1e76cb36568db39a
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x2b (SPI_FAST_FLASH_BOOT)
+Saved PC:0x40383279
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0xd0
+load:0x403c8700,len:0x9f8
+load:0x403cb700,len:0x2544
+entry 0x403c8850
+[0;31mE (518) gpio: gpio_set_direction(310): GPIO number error[0m
+[0;31mE (518) gpio: gpio_set_pull_mode(274): GPIO number error[0m
+[0;31mE (519) gpio: gpio_set_direction(310): GPIO number error[0m
+[0;31mE (525) gpio: gpio_set_pull_mode(274): GPIO number error[0m
+[?7l
+ ____                 _ 
+|  __|___ ___ ___ _ _|_|___ ___ 
+|  __|_ -| . |  _| | | |   | . |
+|____|___|  _|_| |___|_|_|_|___|
+         |_| espruino.com
+ 2v29.536 (c) 2026 G.Williams
+
+Espruino is Open Source. Our work is supported
+only by sales of official boards and donations:
+http://espruino.com/Donate
+
+>
+RUNNER raw_output_end

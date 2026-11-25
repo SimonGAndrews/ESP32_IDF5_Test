@@ -1,0 +1,103 @@
+ESP32-S3 standalone Wi-Fi smoke test | 2026-11-25T00:41:31+00:00
+Setup: one USB-powered ESP32-S3, 115200 baud, local 2.4 GHz AP for association, no harness jumpers required by these fixtures.
+Runner SHA-256: 7ba29e952bf814f09e4e7fdbcf77691a6eea2cf5b6c268ea910017f9694d5e33
+
+Test: tests/WIFI_BLE/wifi/wifi_ping_legacy_smoke.js
+Fixture SHA-256: b43496e1d501bdad8de8107ac13809e9ae2e209199238013e88745d8165a3b24
+Runner timeout: 18 s
+RUNNER test=tests/WIFI_BLE/wifi/wifi_ping_legacy_smoke.js
+RUNNER port=/dev/serial/by-path/pci-0000:00:14.0-usb-0:2.1:1.0
+RUNNER board=ESP32S3
+RUNNER version=2v29.536
+RUNNER git_commit=0cd5e987e
+RUNNER credentials=loaded_without_logging
+RUNNER password_exposed=no
+TEST=wifi_ping_legacy_smoke
+TARGET=ESP32S3
+METRIC ping_callbacks=5
+PASS legacy_ping_smoke
+DONE=PASS
+Runner exit: 0; wall time: 5.9 s; firmware identity matched: True; bench verdict: PASS
+
+Test: tests/WIFI_BLE/wifi/wifi_connect_legacy_smoke.js
+Fixture SHA-256: 782930ee3debfd9f443ff18b55af8a67c20deecb2b0ae0e111992686c77cea36
+Runner timeout: 38 s
+RUNNER test=tests/WIFI_BLE/wifi/wifi_connect_legacy_smoke.js
+RUNNER port=/dev/serial/by-path/pci-0000:00:14.0-usb-0:2.1:1.0
+RUNNER board=ESP32S3
+RUNNER version=2v29.536
+RUNNER git_commit=0cd5e987e
+RUNNER credentials=loaded_without_logging
+RUNNER password_exposed=no
+TEST=wifi_connect_legacy_smoke
+TARGET=ESP32S3
+METRIC connect_callback_count=1
+PASS legacy_connect_smoke
+DONE=PASS
+Runner exit: 0; wall time: 8.4 s; firmware identity matched: True; bench verdict: PASS
+
+Test: tests/WIFI_BLE/wifi/wifi_legacy_station_regression.js
+Fixture SHA-256: eb547dcf2db1b0880797fe93597a9b046a1b9eb13d8eaecc5d05e1070eaf33f1
+Runner timeout: 102 s
+RUNNER test=tests/WIFI_BLE/wifi/wifi_legacy_station_regression.js
+RUNNER port=/dev/serial/by-path/pci-0000:00:14.0-usb-0:2.1:1.0
+RUNNER board=ESP32S3
+RUNNER version=2v29.536
+RUNNER git_commit=0cd5e987e
+RUNNER credentials=loaded_without_logging
+RUNNER password_exposed=no
+TEST=wifi_legacy_station_regression
+TARGET=ESP32S3
+PASS initial_connected error=null ip=<assigned>
+PASS initial_callback_once count=1
+PASS deliberate_disconnect_completed callbacks=1
+INFO stage=unavailable_network
+INFO unavailable_callback error="NO_AP_FOUND"
+PASS unavailable_not_connected status="NO_AP_FOUND"
+PASS unavailable_recovery_connected error=null ip=<assigned>
+PASS unavailable_recovery_callback_once count=1
+FAIL overall_timeout
+METRIC valid_connect_callbacks=2
+METRIC deliberate_disconnect_callbacks=3
+METRIC unavailable_connect_callbacks=1
+METRIC associated_events=2
+METRIC connected_events=2
+METRIC disconnected_events=1
+METRIC repeated_cycles=1
+METRIC checks_passed=6
+METRIC checks_failed=1
+DONE=FAIL
+Runner exit: 1; wall time: 97.3 s; firmware identity matched: True; bench verdict: FAIL
+
+Passing fixtures: 2/3
+
+Station lifecycle repeat | 2026-11-25T00:44:04+00:00 | Runner timeout: 102 s
+RUNNER test=tests/WIFI_BLE/wifi/wifi_legacy_station_regression.js
+RUNNER port=/dev/serial/by-path/pci-0000:00:14.0-usb-0:2.1:1.0
+RUNNER board=ESP32S3
+RUNNER version=2v29.536
+RUNNER git_commit=0cd5e987e
+RUNNER credentials=loaded_without_logging
+RUNNER password_exposed=no
+TEST=wifi_legacy_station_regression
+TARGET=ESP32S3
+PASS initial_connected error=null ip=<assigned>
+PASS initial_callback_once count=1
+PASS deliberate_disconnect_completed callbacks=1
+INFO stage=unavailable_network
+FAIL unavailable_not_connected status="connected"
+PASS unavailable_recovery_connected error=null ip=<assigned>
+PASS unavailable_recovery_callback_once count=1
+FAIL overall_timeout
+METRIC valid_connect_callbacks=2
+METRIC deliberate_disconnect_callbacks=3
+METRIC unavailable_connect_callbacks=0
+METRIC associated_events=2
+METRIC connected_events=2
+METRIC disconnected_events=0
+METRIC repeated_cycles=1
+METRIC checks_passed=5
+METRIC checks_failed=2
+DONE=FAIL
+Runner exit: 1; wall time: 97.3 s; firmware identity matched: True; bench verdict: FAIL
+Cleanup verified: injected credentials removed=True; station disconnected=True

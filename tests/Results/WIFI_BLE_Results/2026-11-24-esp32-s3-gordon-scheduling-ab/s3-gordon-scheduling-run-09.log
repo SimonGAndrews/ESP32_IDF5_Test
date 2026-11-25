@@ -1,0 +1,70 @@
+Missing DONE marker in structured output.
+RUNNER test=docs/investigations/wifi/repros/esp32_wifi_ping_single_handoff.js
+RUNNER port=/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_68:B6:B3:27:2C:40-if00
+RUNNER baud=115200
+RUNNER transport=direct
+RUNNER board=ESP32S3
+RUNNER version=2v29.536
+RUNNER git_commit=0cd5e987e
+TEST=esp32_wifi_ping_single_handoff
+INFO board="ESP32S3"
+INFO version="2v29.536"
+INFO git_commit="0cd5e987e"
+INFO call=accepted
+RUNNER raw_output_begin
+TEST=esp32_wifi_ping_single_handoff
+INFO board="ESP32S3"
+INFO version="2v29.536"
+INFO git_commit="0cd5e987e"
+INFO call=accepted
+Guru Meditation Error: Core  0 panic'ed (LoadProhibited). Exception was unhandled.
+
+Core  0 register dump:
+PC      : 0x42014bde  PS      : 0x00060230  A0      : 0x82044d25  A1      : 0x3fcbf280  
+A2      : 0x00000000  A3      : 0x3fcca0ac  A4      : 0x00000000  A5      : 0x00000000  
+A6      : 0x00000000  A7      : 0x00000000  A8      : 0x0000001c  A9      : 0x00000024  
+A10     : 0x00000009  A11     : 0x00000005  A12     : 0x00000000  A13     : 0x0000002d  
+A14     : 0x0000002d  A15     : 0x00000014  SAR     : 0x0000001f  EXCCAUSE: 0x0000001c  
+EXCVADDR: 0x0000000b  LBEG    : 0x40056f5c  LEND    : 0x40056f72  LCOUNT  : 0x00000000  
+
+
+Backtrace: 0x42014bdb:0x3fcbf280 0x42044d22:0x3fcbf2a0 0x42022084:0x3fcbf2c0 0x4202692d:0x3fcbf380 0x42026ca1:0x3fcbf3b0 0x42026ffc:0x3fcbf3e0 0x42027035:0x3fcbf400 0x42027a1d:0x3fcbf4f0 0x4200c7f9:0x3fcbf510
+
+
+
+
+ELF file SHA256: f98f8dfd1d30e4bb
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x2b (SPI_FAST_FLASH_BOOT)
+Saved PC:0x40383279
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0xd0
+load:0x403c8700,len:0x9f8
+load:0x403cb700,len:0x2544
+entry 0x403c8850
+[0;31mE (521) gpio: gpio_set_direction(310): GPIO number error[0m
+[0;31mE (521) gpio: gpio_set_pull_mode(274): GPIO number error[0m
+[0;31mE (522) gpio: gpio_set_direction(310): GPIO number error[0m
+[0;31mE (528) gpio: gpio_set_pull_mode(274): GPIO number error[0m
+[?7l
+ ____                 _ 
+|  __|___ ___ ___ _ _|_|___ ___ 
+|  __|_ -| . |  _| | | |   | . |
+|____|___|  _|_| |___|_|_|_|___|
+         |_| espruino.com
+ 2v29.536 (c) 2026 G.Williams
+
+Espruino is Open Source. Our work is supported
+only by sales of official boards and donations:
+http://espruino.com/Donate
+
+Uncaught ReferenceError: "finish" is not defined
+    at REPL (:1:12)
+setTimeout(finish, 7000);
+           ^
+>
+RUNNER raw_output_end

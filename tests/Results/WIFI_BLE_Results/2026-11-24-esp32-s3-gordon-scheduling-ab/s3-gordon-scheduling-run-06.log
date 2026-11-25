@@ -1,0 +1,44 @@
+Detected 1 failing checks.
+RUNNER test=docs/investigations/wifi/repros/esp32_wifi_ping_single_handoff.js
+RUNNER port=/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_68:B6:B3:27:2C:40-if00
+RUNNER baud=115200
+RUNNER transport=direct
+RUNNER board=ESP32S3
+RUNNER version=2v29.536
+RUNNER git_commit=0cd5e987e
+TEST=esp32_wifi_ping_single_handoff
+INFO board="ESP32S3"
+INFO version="2v29.536"
+INFO git_commit="0cd5e987e"
+INFO call=accepted [
+INFO call=accepted
+METRIC callback_count=0
+METRIC invalid_result_count=0
+FAIL single_ping_result_handoff callbacks=0 invalid=0
+DONE=FAIL
+RUNNER raw_output_begin
+TEST=esp32_wifi_ping_single_handoff
+INFO board="ESP32S3"
+INFO version="2v29.536"
+INFO git_commit="0cd5e987e"
+INFO call=accepted [ 
+  { "totalCount": 1, "totalBytes": 64, "totalTime": 0, "respTime": 0, 
+    "seqNo": 16, "timeoutCount": 0, "bytes": 64, "error": 0 }
+ ]
+Uncaught ReferenceError: "INFO" is not defined
+    at event (:1:1)
+INFO call=accepted
+^
+{ "totalCount": 2, "totalBytes": 128, "totalTime": 0, "respTime": 0, 
+  "seqNo": 17, "timeoutCount": 0, "bytes": 64, "error": 0 }
+{ "totalCount": 3, "totalBytes": 192, "totalTime": 0, "respTime": 0, 
+  "seqNo": 18, "timeoutCount": 0, "bytes": 64, "error": 0 }
+{ "totalCount": 4, "totalBytes": 256, "totalTime": 0, "respTime": 0, 
+  "seqNo": 19, "timeoutCount": 0, "bytes": 64, "error": 0 }
+{ "totalCount": 5, "totalBytes": 320, "totalTime": 0, "respTime": 0, 
+  "seqNo": 20, "timeoutCount": 0, "bytes": 64, "error": 0 }
+METRIC callback_count=0
+METRIC invalid_result_count=0
+FAIL single_ping_result_handoff callbacks=0 invalid=0
+DONE=FAIL
+RUNNER raw_output_end

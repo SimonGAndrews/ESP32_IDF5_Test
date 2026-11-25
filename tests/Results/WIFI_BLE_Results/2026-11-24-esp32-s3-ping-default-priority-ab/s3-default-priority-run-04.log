@@ -1,0 +1,31 @@
+Detected 1 failing checks.
+RUNNER test=docs/investigations/wifi/repros/esp32_wifi_ping_single_handoff.js
+RUNNER port=/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_68:B6:B3:27:2C:40-if00
+RUNNER baud=115200
+RUNNER transport=direct
+RUNNER board=ESP32S3
+RUNNER version=2v29.536
+RUNNER git_commit=0cd5e987e
+TEST=esp32_wifi_ping_single_handoff
+INFO board="ESP32S3"
+INFO version="2v29.536"
+INFO git_commit="0cd5e987e"
+METRIC callback_count=0
+METRIC invalid_result_count=0
+FAIL single_ping_result_handoff callbacks=0 invalid=0
+DONE=FAIL
+RUNNER raw_output_begin
+TEST=esp32_wifi_ping_single_handoff
+INFO board="ESP32S3"
+INFO version="2v29.536"
+INFO git_commit="0cd5e987e"
+
+ERROR: Unknown type of callback in Event Queue
+ERROR: Unknown type of callback in Event Queue
+ERROR: Unknown type of callback in Event Queue
+ERROR: Unknown type of callback in Event Queue
+METRIC callback_count=0
+METRIC invalid_result_count=0
+FAIL single_ping_result_handoff callbacks=0 invalid=0
+DONE=FAIL
+RUNNER raw_output_end
