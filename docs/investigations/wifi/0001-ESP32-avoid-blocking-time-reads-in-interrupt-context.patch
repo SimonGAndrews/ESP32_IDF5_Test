@@ -1,0 +1,143 @@
+From 896255bffbe9fe8d3b70bb7118c34130e92dec71 Mon Sep 17 00:00:00 2001
+From: Simon Andrews <Simon.g.andrews@live.co.uk>
+Date: Wed, 25 Nov 2026 15:12:39 +0000
+Subject: [PATCH] ESP32: avoid blocking time reads in interrupt context
+
+Keep gettimeofday outside critical sections so ESP-IDF can acquire its time lock. Use the ESP timer and a wall-clock offset for interrupt and other non-yielding callers. Refresh that offset at startup, on wall-clock reads, and after setTime or SNTP synchronization.
+---
+ make/targets/ESP32_IDF5.make |  1 +
+ targets/esp32/jshardware.c   | 63 ++++++++++++++++++++++++++++++------
+ 2 files changed, 55 insertions(+), 9 deletions(-)
+
+diff --git a/make/targets/ESP32_IDF5.make b/make/targets/ESP32_IDF5.make
+index a8e540b22..26b16fe1b 100644
+--- a/make/targets/ESP32_IDF5.make
++++ b/make/targets/ESP32_IDF5.make
+@@ -51,6 +51,7 @@ $(CMAKEFILE):
+ 		spi_flash \
+ 		esp_event \
+ 		esp_netif \
++		esp_timer \
+ 		esp_wifi \
+ 		hal \
+ 		lwip \
+diff --git a/targets/esp32/jshardware.c b/targets/esp32/jshardware.c
+index ff846ae36..75130d184 100644
+--- a/targets/esp32/jshardware.c
++++ b/targets/esp32/jshardware.c
+@@ -48,6 +48,7 @@
+ #include "jsinteractive.h"
+ #include "jspininfo.h"
+ #ifdef USE_NET
++#include "esp_sntp.h"
+ #include "jswrap_esp32_network.h"
+ #endif
+ #include "soc/uart_reg.h"
+@@ -57,6 +58,7 @@
+ #include "esp_wifi.h"
+ #include "esp_system.h"
+ #include "esp_task_wdt.h"
++#include "esp_timer.h"
+ #include "esp_log.h"
+ #include "esp_pm.h"
+ #include "rom/ets_sys.h"
+@@ -104,6 +106,11 @@ BITFIELD_DECL(jshPinSoftPWM, JSH_PIN_COUNT);
+ /// Has the watchdog been enabled?
+ bool wdt_enabled = false;
+ 
++static JsSysTime readSystemTime(bool forceOffsetUpdate);
++#ifdef USE_NET
++static void systemTimeSynchronized(struct timeval *time);
++#endif
++
+ static uint64_t DEVICE_INITIALISED_FLAGS = 0L;
+ 
+ void jshSetDeviceInitialised(IOEventFlags device, bool isInit) {
+@@ -184,10 +191,12 @@ void jshPinDefaultPullup() {
+  * Initialize the JavaScript hardware interface.
+  */
+ void jshInit() {
++  readSystemTime(true);
+ #ifdef CONFIG_ESP_TASK_WDT
+   ESP_LOGW("Espruino", "ESP-IDF task watchdog enabled in sdkconfig; E.enableWatchdog may behave inconsistently");
+ #endif
+ #ifdef USE_NET
++  esp_sntp_set_time_sync_notification_cb(systemTimeSynchronized);
+   if(ESP32_Get_NVS_Status(ESP_NETWORK_WIFI)) esp32_wifi_init();
+ #endif
+ #ifdef BLUETOOTH
+@@ -697,16 +706,45 @@ JsVarFloat jshGetMillisecondsFromTime(JsSysTime time) {
+ }
+ 
+ 
++static portMUX_TYPE systemTimeOffsetMux = portMUX_INITIALIZER_UNLOCKED;
++static JsSysTime systemTimeOffset;
++static int64_t systemTimeSampleEnd;
++
++static JsSysTime CALLED_FROM_INTERRUPT systemTimeFromOffset() {
++  portENTER_CRITICAL_ISR(&systemTimeOffsetMux);
++  JsSysTime time = esp_timer_get_time() + systemTimeOffset;
++  portEXIT_CRITICAL_ISR(&systemTimeOffsetMux);
++  return time;
++}
++
++static JsSysTime readSystemTime(bool forceOffsetUpdate) {
++  struct timeval tm;
++  int64_t start = esp_timer_get_time();
++  if (gettimeofday(&tm, NULL) != 0) return systemTimeFromOffset();
++  int64_t end = esp_timer_get_time();
++  JsSysTime time = (JsSysTime)tm.tv_sec * 1000000L + tm.tv_usec;
++
++  // Skip samples delayed by preemption or lock contention during routine reads.
++  if (forceOffsetUpdate || end - start <= 100) {
++    portENTER_CRITICAL(&systemTimeOffsetMux);
++    // A newer sample from another task may already have been published.
++    if (start >= systemTimeSampleEnd) {
++      // Bias the estimate earlier: watch timestamps are reconstructed as past events.
++      systemTimeOffset = time - end;
++      systemTimeSampleEnd = end;
++    }
++    portEXIT_CRITICAL(&systemTimeOffsetMux);
++  }
++  return time;
++}
++
+ /**
+- * Return the current time in microseconds.
++ * Return the current time in microseconds, including from interrupt handlers.
+  */
+-static portMUX_TYPE JSmicrosMux = portMUX_INITIALIZER_UNLOCKED;
+-JsSysTime CALLED_FROM_INTERRUPT jshGetSystemTime() { // in us -- can be called at interrupt time
+-  struct timeval tm;
+-  portENTER_CRITICAL_ISR(&JSmicrosMux);
+-  gettimeofday(&tm, 0);
+-  portEXIT_CRITICAL_ISR(&JSmicrosMux);
+-  return (JsSysTime)(tm.tv_sec)*1000000L + tm.tv_usec;
++JsSysTime CALLED_FROM_INTERRUPT jshGetSystemTime() {
++  // gettimeofday() can block on newlib's time mutex.
++  if (!xPortCanYield()) return systemTimeFromOffset();
++  return readSystemTime(false);
+ }
+ 
+ /**
+@@ -720,9 +758,16 @@ void jshSetSystemTime(JsSysTime newTime) {
+   tm.tv_usec=(suseconds_t) (newTime - tm.tv_sec * 1000000L);
+   tz.tz_minuteswest=0;
+   tz.tz_dsttime=0;
+-  settimeofday(&tm, &tz);
++  if (settimeofday(&tm, &tz) == 0) readSystemTime(true);
+ }
+ 
++#ifdef USE_NET
++static void systemTimeSynchronized(struct timeval *time) {
++  NOT_USED(time);
++  readSystemTime(true);
++}
++#endif
++
+ void jshUtilTimerDisable() {
+   timer_pause(TIMER_GROUP_0, 0);
+   timer_disable_intr(TIMER_GROUP_0, 0);
+-- 
+2.43.0
+

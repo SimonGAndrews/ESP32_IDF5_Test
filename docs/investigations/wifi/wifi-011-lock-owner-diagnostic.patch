@@ -1,0 +1,194 @@
+diff --git a/components/freertos/FreeRTOS-Kernel/queue.c b/components/freertos/FreeRTOS-Kernel/queue.c
+index 185dd47a..7137cf49 100644
+--- a/components/freertos/FreeRTOS-Kernel/queue.c
++++ b/components/freertos/FreeRTOS-Kernel/queue.c
+@@ -44,6 +44,9 @@
+ /* Include private IDF API additions for critical thread safety macros */
+ #include "esp_private/freertos_idf_additions_priv.h"
+ 
++void wifi011_time_mutex_taken(void *mutex, TaskHandle_t owner);
++void wifi011_time_mutex_failed(void *mutex, TaskHandle_t owner);
++
+ #if ( configUSE_CO_ROUTINES == 1 )
+     #include "croutine.h"
+ #endif
+@@ -1748,6 +1751,7 @@ BaseType_t xQueueSemaphoreTake( QueueHandle_t xQueue,
+                         /* Record the information required to implement
+                          * priority inheritance should it become necessary. */
+                         pxQueue->u.xSemaphore.xMutexHolder = pvTaskIncrementMutexHeldCount();
++                        wifi011_time_mutex_taken( pxQueue, pxQueue->u.xSemaphore.xMutexHolder );
+                     }
+                     else
+                     {
+@@ -2240,6 +2244,10 @@ BaseType_t xQueueReceiveFromISR( QueueHandle_t xQueue,
+         {
+             xReturn = pdFAIL;
+             traceQUEUE_RECEIVE_FROM_ISR_FAILED( pxQueue );
++            if( pxQueue->uxQueueType == queueQUEUE_IS_MUTEX )
++            {
++                wifi011_time_mutex_failed( pxQueue, pxQueue->u.xSemaphore.xMutexHolder );
++            }
+         }
+     }
+     prvEXIT_CRITICAL_OR_UNMASK_ISR( &( pxQueue->xQueueLock ), uxSavedInterruptStatus );
+diff --git a/components/lwip/apps/ping/ping_sock.c b/components/lwip/apps/ping/ping_sock.c
+index 8870eaaa..7f8975c7 100644
+--- a/components/lwip/apps/ping/ping_sock.c
++++ b/components/lwip/apps/ping/ping_sock.c
+@@ -28,6 +28,9 @@
+ 
+ const static char *TAG = "ping_sock";
+ 
++int wifi011_ping_gettimeofday(struct timeval *tv, TaskHandle_t ping_task,
++                             unsigned line, unsigned hold_ms);
++
+ #define PING_TIME_DIFF_MS(_end, _start) ((uint32_t)(((_end).tv_sec - (_start).tv_sec) * 1000 + \
+                                                     ((_end).tv_usec - (_start).tv_usec) / 1000))
+ 
+@@ -156,6 +159,7 @@ static void esp_ping_thread(void *args)
+     TickType_t last_wake;
+     struct timeval start_time, end_time;
+     int recv_ret;
++    const unsigned hold_ms = 250;
+ 
+     while (1) {
+         /* wait for ping start signal */
+@@ -167,11 +171,19 @@ static void esp_ping_thread(void *args)
+             ep->total_time_ms = 0;
+ 
+             last_wake = xTaskGetTickCount();
++            /* Special loopback addresses opt in to an artificial lock hold. */
++            uint32_t target = 0;
++            if (ep->target_addr.ss_family == AF_INET) {
++                const struct sockaddr_in *address = (const struct sockaddr_in *)&ep->target_addr;
++                target = lwip_ntohl(address->sin_addr.s_addr);
++            }
+             while ((ep->flags & PING_FLAGS_START) && ((ep->count == 0) || (ep->packet_hdr->seqno < ep->count))) {
+                 esp_ping_send(ep);
+-                gettimeofday(&start_time, NULL);
++                wifi011_ping_gettimeofday(&start_time, ep->ping_task_hdl, __LINE__,
++                                          target == 0x7f000002u ? hold_ms : 0);
+                 recv_ret = esp_ping_receive(ep);
+-                gettimeofday(&end_time, NULL);
++                wifi011_ping_gettimeofday(&end_time, ep->ping_task_hdl, __LINE__,
++                                          target == 0x7f000003u ? hold_ms : 0);
+                 ep->elapsed_time_ms = PING_TIME_DIFF_MS(end_time, start_time);
+                 ep->total_time_ms += ep->elapsed_time_ms;
+                 if (recv_ret >= 0) {
+diff --git a/components/newlib/src/locks.c b/components/newlib/src/locks.c
+index 582256dc..d4214362 100644
+--- a/components/newlib/src/locks.c
++++ b/components/newlib/src/locks.c
+@@ -44,6 +44,8 @@ struct __lock __lock___libc_recursive_mutex;
+ 
+ static portMUX_TYPE lock_init_spinlock = portMUX_INITIALIZER_UNLOCKED;
+ 
++void wifi011_report_time_failure(void *mutex);
++
+ /* Initialize the given lock by allocating a new mutex semaphore
+    as the _lock_t value.
+ 
+@@ -147,6 +149,7 @@ static int NEWLIB_LOCKS_IRAM_ATTR lock_acquire_generic(_lock_t *lock, uint32_t d
+         BaseType_t higher_task_woken = false;
+         success = xSemaphoreTakeFromISR(h, &higher_task_woken);
+         if (!success && delay > 0) {
++            wifi011_report_time_failure(h);
+             abort(); /* Tried to block on mutex from ISR, couldn't... rewrite your program to avoid libc interactions in ISRs! */
+         }
+         if (higher_task_woken) {
+diff --git a/components/newlib/src/time.c b/components/newlib/src/time.c
+index 1f609422..0db4424d 100644
+--- a/components/newlib/src/time.c
++++ b/components/newlib/src/time.c
+@@ -45,6 +45,80 @@ static int64_t  s_adjtime_total_correction_us;
+ 
+ static _lock_t s_time_lock;
+ 
++/* WIFI-011 bench instrumentation. Only explicit diagnostic ping calls carry a
++ * source tag or delay. The FreeRTOS hooks run under the time mutex's queue lock.
++ */
++typedef struct {
++    TaskHandle_t task;
++    unsigned line;
++    unsigned hold_ms;
++} wifi011_time_call_t;
++
++typedef struct {
++    wifi011_time_call_t owner;
++    char owner_name[configMAX_TASK_NAME_LEN];
++} wifi011_time_failure_t;
++
++static __thread wifi011_time_call_t s_wifi011_ping_call;
++static wifi011_time_call_t s_wifi011_time_owner;
++static wifi011_time_failure_t s_wifi011_failure[configNUMBER_OF_CORES];
++
++int wifi011_ping_gettimeofday(struct timeval *tv, TaskHandle_t ping_task,
++                             unsigned line, unsigned hold_ms);
++void wifi011_time_mutex_taken(void *mutex, TaskHandle_t owner);
++void wifi011_time_mutex_failed(void *mutex, TaskHandle_t owner);
++void wifi011_report_time_failure(void *mutex);
++
++int wifi011_ping_gettimeofday(struct timeval *tv, TaskHandle_t ping_task,
++                             unsigned line, unsigned hold_ms)
++{
++    s_wifi011_ping_call = (wifi011_time_call_t){ping_task, line, hold_ms};
++    int result = gettimeofday(tv, NULL);
++    s_wifi011_ping_call = (wifi011_time_call_t){0};
++    return result;
++}
++
++void IRAM_ATTR wifi011_time_mutex_taken(void *mutex, TaskHandle_t owner)
++{
++    if (mutex != (void *)s_time_lock) {
++        return;
++    }
++    s_wifi011_time_owner = (wifi011_time_call_t){.task = owner};
++    if (s_wifi011_ping_call.task == owner) {
++        s_wifi011_time_owner = s_wifi011_ping_call;
++    }
++}
++
++void IRAM_ATTR wifi011_time_mutex_failed(void *mutex, TaskHandle_t owner)
++{
++    if (mutex != (void *)s_time_lock) {
++        return;
++    }
++    wifi011_time_failure_t *failure = &s_wifi011_failure[xPortGetCoreID()];
++    failure->owner = (wifi011_time_call_t){.task = owner};
++    if (owner && s_wifi011_time_owner.task == owner) {
++        failure->owner = s_wifi011_time_owner;
++    }
++    const char *name = owner ? pcTaskGetName(owner) : "";
++    unsigned i = 0;
++    for (; i < sizeof(failure->owner_name) - 1 && name[i]; i++) {
++        failure->owner_name[i] = name[i];
++    }
++    failure->owner_name[i] = '\0';
++}
++
++void IRAM_ATTR wifi011_report_time_failure(void *mutex)
++{
++    if (mutex != (void *)s_time_lock) {
++        return;
++    }
++    const wifi011_time_failure_t *failure = &s_wifi011_failure[xPortGetCoreID()];
++    esp_rom_printf("WIFI011 mutex=s_time_lock waiter=%s owner=%s owner_handle=%p "
++                   "ping_sock_line=%u forced_hold_ms=%u\n",
++                   pcTaskGetName(NULL), failure->owner_name, failure->owner.task,
++                   failure->owner.line, failure->owner.hold_ms);
++}
++
+ // This function gradually changes boot_time to the correction value and immediately updates it.
+ static uint64_t adjust_boot_time(void)
+ {
+@@ -90,6 +164,10 @@ static uint64_t adjust_boot_time(void)
+ static uint64_t get_adjusted_boot_time(void)
+ {
+     _lock_acquire(&s_time_lock);
++    if (xPortCanYield() && s_wifi011_ping_call.hold_ms) {
++        /* Deliberately keep the mutex held while other tasks can run. */
++        vTaskDelay(pdMS_TO_TICKS(s_wifi011_ping_call.hold_ms));
++    }
+     uint64_t adjust_time = adjust_boot_time();
+     _lock_release(&s_time_lock);
+     return adjust_time;
